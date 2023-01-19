@@ -1,3 +1,9 @@
+#![feature(decl_macro)]
+
+mod index;
+
+use rocket::{ignite, routes};
+
 fn main() {
-    println!("Hello, world!");
+    ignite().mount("/", routes![index::get]).launch();
 }
