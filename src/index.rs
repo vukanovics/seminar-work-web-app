@@ -1,6 +1,7 @@
 use rocket::get;
+use rocket_dyn_templates::{context, Template};
 
 #[get("/")]
-pub fn get() -> String {
-    "Hello world!".to_string()
+pub fn get() -> Template {
+    Template::render("index", context! {})
 }
