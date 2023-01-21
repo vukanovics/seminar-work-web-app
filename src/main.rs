@@ -5,15 +5,24 @@ mod database;
 mod index;
 mod register;
 
-use rocket::{ignite, routes};
+mod models;
+mod schema;
 
-use application::{ApplicationError, SharedState};
+use std::sync::Mutex;
 
-fn main() -> Result<(), ApplicationError> {
-    let shared_state = SharedState::new()?;
-    ignite()
+use dotenvy::dotenv;
+use rocket::{build, launch, routes};
+use rocket_dyn_templates::Template;
+
+use application::{ApplicationError, SharedStateData};
+
+#[launch]
+fn rocket() -> _ {
+    dotenv().ok();
+
+    let shared_state = Mutex::new(SharedStateData::new().unwrap());
+    build()
         .mount("/", routes![index::get, register::get, register::post])
+        .attach(Template::fairing())
         .manage(shared_state)
-        .launch();
-    Ok(())
 }

@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Server error</title>
+  </head>
+  <body>
+    <p>The server has encountered an error while serving your request!</p>
+    {{#if error_message}}
+      <p>Error message: {{error_message}}</p>
+    {{else}}
+      <p>No additional error message was provided :(<p>
+    {{/if}}
+  </body>
+</html>
