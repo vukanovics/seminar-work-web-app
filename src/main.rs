@@ -1,4 +1,5 @@
 #![feature(decl_macro)]
+#![feature(result_flattening)]
 
 mod application;
 mod database;

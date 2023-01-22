@@ -1,9 +1,13 @@
 use bcrypt::BcryptError;
 use diesel::result::Error as DieselError;
-use rocket::Responder;
+use rocket::{
+    http::{Cookie, CookieJar},
+    Responder, State,
+};
 use rocket_dyn_templates::{context, Template};
+use serde::Serialize;
 
-use crate::database::Database;
+use crate::{database::Database, models::User};
 
 #[derive(Debug)]
 pub enum ApplicationError {
@@ -84,5 +88,71 @@ impl SharedStateData {
 
     pub fn database(&mut self) -> &mut Database {
         &mut self.database
+    }
+}
+
+#[derive(Serialize, Debug)]
+pub struct BaseLayoutContext {
+    username: Option<String>,
+}
+
+impl BaseLayoutContext {
+    fn get_valid_user_info_from_session_cookie(
+        state: &State<SharedState>,
+        cookie: &Cookie<'static>,
+    ) -> Result<Option<User>, ApplicationError> {
+        hex::decode(cookie.value())
+            .ok()
+            // attempt to get a session with that session key
+            .and_then(|decoded_key| {
+                state
+                    .lock()
+                    .unwrap()
+                    .database()
+                    .get_session_by_key(decoded_key)
+                    .transpose()
+            })
+            // if the session exists, attempt to get a user with the session's user_id
+            .and_then(|maybe_session| {
+                maybe_session
+                    .map(|session| {
+                        state
+                            .lock()
+                            .unwrap()
+                            .database()
+                            .get_user_by_id(session.user_id)
+                            .transpose()
+                    })
+                    .transpose()
+            })
+            // merge the two Results into one
+            .map(|user| user.flatten())
+            .transpose()
+    }
+    fn get_valid_user_info(
+        state: &State<SharedState>,
+        jar: &CookieJar,
+    ) -> Result<Option<User>, ApplicationError> {
+        // attempt the current session key cookie
+        jar.get("session-key")
+            .map(|cookie| Self::get_valid_user_info_from_session_cookie(state, cookie))
+            // or if that fails, try the one not yet sent to the user
+            .or_else(|| {
+                jar.get_pending("session-key")
+                    .map(|cookie| Self::get_valid_user_info_from_session_cookie(state, &cookie))
+            })
+            .transpose()
+            // combine the two options into one
+            .map(|either_session_key| either_session_key.flatten())
+    }
+
+    pub fn new(
+        state: &State<SharedState>,
+        jar: &CookieJar,
+    ) -> Result<BaseLayoutContext, ApplicationError> {
+        let user_info = Self::get_valid_user_info(state, jar)?;
+        Ok(BaseLayoutContext {
+            username: user_info.map(|info| info.username),
+        })
     }
 }

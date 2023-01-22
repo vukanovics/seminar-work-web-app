@@ -1,14 +1,66 @@
-use rocket::{form::Form, get, post, FromForm, State};
-use rocket_dyn_templates::{context, Template};
+use rocket::{form::Form, get, http::CookieJar, post, FromForm, State};
+use rocket_dyn_templates::Template;
+use serde::Serialize;
 
 use crate::{
-    application::{ApplicationError, ApplicationErrorResponder, SharedState},
+    application::{ApplicationError, ApplicationErrorResponder, BaseLayoutContext, SharedState},
     models::NewUser,
 };
 
+#[derive(Serialize, Debug)]
+struct RegisterLayoutContext {
+    #[serde(flatten)]
+    base_context: BaseLayoutContext,
+    previous_username: Option<String>,
+    previous_email: Option<String>,
+    error: Option<String>,
+    success: Option<String>,
+}
+
+impl RegisterLayoutContext {
+    pub fn new(
+        state: &State<SharedState>,
+        jar: &CookieJar,
+    ) -> Result<RegisterLayoutContext, ApplicationError> {
+        Ok(RegisterLayoutContext {
+            base_context: BaseLayoutContext::new(state, jar)?,
+            previous_username: None,
+            previous_email: None,
+            error: None,
+            success: None,
+        })
+    }
+
+    pub fn with_previous_username(mut self, previous_username: Option<String>) -> Self {
+        self.previous_username = previous_username;
+        self
+    }
+
+    pub fn with_previous_email(mut self, previous_email: Option<String>) -> Self {
+        self.previous_email = previous_email;
+        self
+    }
+
+    pub fn with_error(mut self, error: Option<String>) -> Self {
+        self.error = error;
+        self
+    }
+
+    pub fn with_success(mut self, success: Option<String>) -> Self {
+        self.success = success;
+        self
+    }
+}
+
 #[get("/register")]
-pub fn get(_state: &State<SharedState>) -> Template {
-    Template::render("register", context! {})
+pub fn get(
+    state: &State<SharedState>,
+    jar: &CookieJar,
+) -> Result<Template, ApplicationErrorResponder> {
+    Ok(Template::render(
+        "register",
+        RegisterLayoutContext::new(state, jar)?,
+    ))
 }
 
 #[derive(FromForm)]
@@ -53,8 +105,10 @@ impl RegisterForm {
 #[post("/register", data = "<data>")]
 pub fn post(
     state: &State<SharedState>,
+    jar: &CookieJar,
     data: Form<RegisterForm>,
 ) -> Result<Template, ApplicationErrorResponder> {
+    let context = RegisterLayoutContext::new(state, jar)?;
     if let Some(error_message) = 'requirements: {
         if !data.all_fields_populated() {
             break 'requirements Some("All fields are required!");
@@ -72,11 +126,10 @@ pub fn post(
     } {
         return Ok(Template::render(
             "register",
-            context! {
-                error: error_message,
-                previous_username: data.username.clone(),
-                previous_email: data.email.clone()
-            },
+            context
+                .with_error(Some(error_message.to_string()))
+                .with_previous_username(Some(data.username.clone()))
+                .with_previous_email(Some(data.email.clone())),
         ));
     }
 
@@ -93,8 +146,6 @@ pub fn post(
 
     Ok(Template::render(
         "register",
-        context! {
-            success: "Account successfully registered!",
-        },
+        context.with_success(Some("Account successfully registered!".to_string())),
     ))
 }

@@ -5,13 +5,63 @@ use rocket::{
     http::{Cookie, CookieJar},
     post, FromForm, State,
 };
-use rocket_dyn_templates::{context, Template};
+use rocket_dyn_templates::Template;
+use serde::{self, Serialize};
 
-use crate::application::{ApplicationError, ApplicationErrorResponder, SharedState};
+use crate::application::{
+    ApplicationError, ApplicationErrorResponder, BaseLayoutContext, SharedState,
+};
+
+#[derive(Serialize, Debug)]
+struct LoginLayoutContext {
+    #[serde(flatten)]
+    base_context: BaseLayoutContext,
+    previous_username_or_email: Option<String>,
+    error: Option<String>,
+    success: Option<String>,
+}
+
+impl LoginLayoutContext {
+    pub fn new(
+        state: &State<SharedState>,
+        jar: &CookieJar,
+    ) -> Result<LoginLayoutContext, ApplicationError> {
+        Ok(LoginLayoutContext {
+            base_context: BaseLayoutContext::new(state, jar)?,
+            previous_username_or_email: None,
+            error: None,
+            success: None,
+        })
+    }
+
+    pub fn with_previous_username_or_email(
+        mut self,
+        previous_username_or_email: Option<String>,
+    ) -> Self {
+        self.previous_username_or_email = previous_username_or_email;
+        self
+    }
+
+    pub fn with_error(mut self, error: Option<String>) -> Self {
+        self.error = error;
+        self
+    }
+
+    pub fn with_success(mut self, success: Option<String>) -> Self {
+        self.success = success;
+        self
+    }
+}
 
 #[get("/login")]
-pub fn get(_state: &State<SharedState>) -> Template {
-    Template::render("login", context! {})
+pub fn get(
+    state: &State<SharedState>,
+    jar: &CookieJar,
+) -> Result<Template, ApplicationErrorResponder> {
+    Ok(Template::render(
+        "login",
+        LoginLayoutContext::new(state, jar)?,
+    ))
 }
 
 #[derive(FromForm)]
@@ -84,17 +134,15 @@ pub fn post(
     } {
         return Ok(Template::render(
             "login",
-            context! {
-                error: error_message,
-                previous_username_or_email: data.username_or_email.clone(),
-            },
+            LoginLayoutContext::new(state, jar)?
+                .with_previous_username_or_email(Some(data.username_or_email.clone()))
+                .with_error(Some(error_message.to_owned())),
         ));
     }
 
     Ok(Template::render(
         "login",
-        context! {
-            success: "Logged in successfully!",
-        },
+        LoginLayoutContext::new(state, jar)?
+            .with_success(Some("Logged in successfully!".to_string())),
     ))
 }
