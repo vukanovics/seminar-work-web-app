@@ -1,3 +1,4 @@
+use bcrypt::BcryptError;
 use diesel::result::Error as DieselError;
 use rocket::Responder;
 use rocket_dyn_templates::{context, Template};
@@ -9,12 +10,19 @@ pub enum ApplicationError {
     MissingDatabaseUrl,
     UnableToConnectToDatabase,
     FailedOnADatabaseQuery(DieselError),
-    FailedToHashPassword,
+    FailedOnABcryptFunction(BcryptError),
+    RandError(rand::Error),
 }
 
 impl From<DieselError> for ApplicationError {
     fn from(value: DieselError) -> Self {
         Self::FailedOnADatabaseQuery(value)
+    }
+}
+
+impl From<BcryptError> for ApplicationError {
+    fn from(value: BcryptError) -> Self {
+        Self::FailedOnABcryptFunction(value)
     }
 }
 
@@ -36,11 +44,14 @@ impl From<ApplicationError> for ApplicationErrorResponder {
             ApplicationError::UnableToConnectToDatabase => {
                 ErrorMessage::Reference("Unable to connect to the provided database URL")
             }
-            ApplicationError::FailedToHashPassword => {
-                ErrorMessage::Reference("Failed to hash password")
+            ApplicationError::FailedOnABcryptFunction(bcrypt_error) => {
+                ErrorMessage::String(format!("Failed on a bcrypt function: {bcrypt_error}"))
             }
             ApplicationError::FailedOnADatabaseQuery(diesel_error) => {
                 ErrorMessage::String(format!("Failed on a database query: {diesel_error}"))
+            }
+            ApplicationError::RandError(rand_error) => {
+                ErrorMessage::String(format!("Rand error: {rand_error}"))
             }
         };
 

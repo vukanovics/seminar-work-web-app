@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<!-- vim: set ft=html: -->
+<html>
+  <head>
+    <title>Seminarski</title>
+  </head>
+  <body>
+    <form action="/login" method="post">
+      <label for="username">Username:</label>
+      <input type="text" id="username_or_email" name="username_or_email" 
+        {{#if previous_username_or_email}}
+          value="{{previous_username_or_email}}" 
+        {{/if}}
+      >
+      <br>
+      <label for="password">Password:</label>
+      <input type="text" id="password" name="password">
+      <input type="submit" value="submit">
+  </body>
+  {{#if error}}
+  <p>Error! {{error}}</p>
+  {{/if}}
+  {{#if success}}
+  <p>Success! {{success}}</p>
+  {{/if}}
+</html>

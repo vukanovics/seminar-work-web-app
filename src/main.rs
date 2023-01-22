@@ -3,6 +3,7 @@
 mod application;
 mod database;
 mod index;
+mod login;
 mod register;
 
 mod models;
@@ -22,7 +23,16 @@ fn rocket() -> _ {
 
     let shared_state = Mutex::new(SharedStateData::new().unwrap());
     build()
-        .mount("/", routes![index::get, register::get, register::post])
+        .mount(
+            "/",
+            routes![
+                index::get,
+                register::get,
+                register::post,
+                login::get,
+                login::post
+            ],
+        )
         .attach(Template::fairing())
         .manage(shared_state)
 }

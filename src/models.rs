@@ -1,6 +1,6 @@
 use diesel::prelude::*;
 
-use crate::schema::users;
+use crate::schema::{sessions, users};
 
 #[derive(Queryable, Debug)]
 pub struct User {
@@ -16,4 +16,11 @@ pub struct NewUser<'a> {
     pub username: &'a str,
     pub password: &'a str,
     pub email: &'a str,
+}
+
+#[derive(Insertable, Queryable)]
+#[diesel(table_name = sessions)]
+pub struct Session {
+    pub session_key: Vec<u8>,
+    pub user_id: i32,
 }

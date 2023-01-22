@@ -1,0 +1,4 @@
+CREATE TABLE sessions (
+  session_key BINARY(32) PRIMARY KEY UNIQUE NOT NULL,
+  user_id INTEGER NOT NULL
+);

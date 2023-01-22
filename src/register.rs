@@ -81,7 +81,7 @@ pub fn post(
     }
 
     let hashed_password = bcrypt::hash(data.password.clone(), bcrypt::DEFAULT_COST)
-        .map_err(|_| ApplicationError::FailedToHashPassword)?;
+        .map_err(ApplicationError::FailedOnABcryptFunction)?;
 
     let new_user = NewUser {
         username: &data.username,
