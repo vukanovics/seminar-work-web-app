@@ -1,6 +1,9 @@
 #![feature(decl_macro)]
 #![feature(result_flattening)]
 
+#![warn(clippy::pedantic)]
+#![deny(warnings)]
+#![allow(clippy::no_effect_underscore_binding)]
 mod application;
 mod database;
 mod index;
