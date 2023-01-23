@@ -94,4 +94,12 @@ impl Database {
             .execute(&mut self.connection)?;
         Ok(())
     }
+
+    pub fn remove_session_by_key(&mut self, by_key: Vec<u8>) -> Result<(), ApplicationError> {
+        use crate::schema::sessions::dsl::*;
+        diesel::delete(sessions)
+            .filter(session_key.eq(by_key))
+            .execute(&mut self.connection)?;
+        Ok(())
+    }
 }

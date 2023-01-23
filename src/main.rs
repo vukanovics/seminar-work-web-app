@@ -5,6 +5,7 @@ mod application;
 mod database;
 mod index;
 mod login;
+mod logout;
 mod register;
 
 mod models;
@@ -33,7 +34,8 @@ fn rocket() -> _ {
                 register::get,
                 register::post,
                 login::get,
-                login::post
+                login::post,
+                logout::get
             ],
         )
         .attach(Template::fairing())
