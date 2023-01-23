@@ -61,6 +61,7 @@ pub fn get(state: &State<SharedState>, jar: &CookieJar) -> Result<Template, Erro
 }
 
 #[derive(FromForm)]
+#[allow(clippy::module_name_repetitions)]
 pub struct RegisterForm {
     pub username: String,
     pub email: String,
