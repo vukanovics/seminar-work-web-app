@@ -83,11 +83,13 @@ pub fn post(
             break 'requirements Some("All fields are required!");
         }
 
-        let Some(_user_info) = state.lock().unwrap().get_valid_user_info(jar)? else {
+        let Some(user_info) = state.lock().unwrap().get_valid_user_info(jar)? else {
             break 'requirements Some("You need to log in first!")
         };
 
         state.lock().unwrap().database().create_post(NewPost {
+            author: user_info.id,
+            created_on: chrono::offset::Utc::now().naive_utc(),
             title: &data.title,
             description: &data.description,
             content: &data.content,

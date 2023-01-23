@@ -7,7 +7,8 @@ edition = "2021"
 
 [dependencies]
 bcrypt = "0.13.0"
-diesel = { version = "2.0.2", features = ["mysql"] }
+chrono = { version = "0.4.23", features = ["serde"] }
+diesel = { version = "2.0.2", features = ["mysql", "chrono"] }
 dotenvy = "0.15.6"
 hex = "0.4.3"
 rand = "0.8.5"

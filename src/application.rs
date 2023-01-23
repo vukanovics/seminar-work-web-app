@@ -16,6 +16,7 @@ pub enum Error {
     Diesel(DieselError),
     Bcrypt(BcryptError),
     Rand(rand::Error),
+    PostHasInvalidUserId,
 }
 
 impl From<DieselError> for Error {
@@ -47,6 +48,9 @@ impl From<Error> for ErrorResponder {
             }
             Error::UnableToConnectToDatabase => {
                 ErrorMessage::Reference("Unable to connect to the provided database URL")
+            }
+            Error::PostHasInvalidUserId => {
+                ErrorMessage::Reference("Post has an invalid user id")
             }
             Error::Bcrypt(bcrypt_error) => {
                 ErrorMessage::String(format!("Failed on a bcrypt function: {bcrypt_error}"))

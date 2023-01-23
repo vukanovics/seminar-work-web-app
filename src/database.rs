@@ -3,7 +3,7 @@ use std::env;
 use diesel::{mysql::MysqlConnection, prelude::*, Connection, RunQueryDsl};
 
 use crate::{
-    models::{NewPost, NewUser, Session, User},
+    models::{NewPost, NewUser, Post, Session, User},
     schema::{posts, sessions, users},
     Error,
 };
@@ -72,6 +72,15 @@ impl Database {
                 .limit(1)
                 .first::<Session>(&mut self.connection),
         )
+    }
+
+    pub fn get_latest_x_posts(&mut self, count: i64) -> Result<Vec<Post>, Error> {
+        use crate::schema::posts::dsl::{created_on, posts};
+        posts
+            .limit(count)
+            .order(created_on)
+            .load::<Post>(&mut self.connection)
+            .map_err(Error::Diesel)
     }
 
     pub fn create_user(&mut self, user: NewUser) -> Result<(), Error> {

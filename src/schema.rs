@@ -3,6 +3,8 @@
 diesel::table! {
     posts (id) {
         id -> Integer,
+        author -> Integer,
+        created_on -> Datetime,
         title -> Text,
         description -> Text,
         content -> Mediumtext,
@@ -24,6 +26,8 @@ diesel::table! {
         email -> Varchar,
     }
 }
+
+diesel::joinable!(posts -> users (author));
 
 diesel::allow_tables_to_appear_in_same_query!(
     posts,

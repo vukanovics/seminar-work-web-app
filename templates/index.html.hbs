@@ -3,6 +3,16 @@
 {{#*inline "page"}}
 
 <p>Welcome!</p>
+<div class="post-container">
+  {{#each posts}}
+  <div class="post">
+    <p>{{this.title}}</p>
+    <p>{{this.human_creation_time}}</p>
+    <p>{{this.author}}</p>
+    <p>{{this.description}}</p>
+  </div>
+  {{/each}}
+</div>
 
 {{/inline}}
 {{> base username=username }}

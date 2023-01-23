@@ -1,4 +1,7 @@
+use chrono::NaiveDateTime;
+
 use diesel::prelude::*;
+use serde::Serialize;
 
 use crate::schema::{posts, sessions, users};
 
@@ -25,10 +28,12 @@ pub struct Session {
     pub user_id: i32,
 }
 
-#[derive(Queryable)]
+#[derive(Queryable, Debug, Serialize)]
 #[diesel(table_name = posts)]
 pub struct Post {
     pub id: i32,
+    pub author: i32,
+    pub created_on: NaiveDateTime,
     pub title: String,
     pub description: String,
     pub content: String,
@@ -38,6 +43,8 @@ pub struct Post {
 #[diesel(table_name = posts)]
 pub struct NewPost<'a> {
     pub title: &'a str,
+    pub author: i32,
+    pub created_on: NaiveDateTime,
     pub description: &'a str,
     pub content: &'a str,
 }

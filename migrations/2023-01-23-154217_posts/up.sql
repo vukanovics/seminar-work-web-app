@@ -1,6 +1,9 @@
 CREATE TABLE posts (
   id INTEGER PRIMARY KEY AUTO_INCREMENT,
+  author INTEGER NOT NULL,
+  created_on DATETIME NOT NULL,
   title TEXT(255) NOT NULL,
   description TEXT(255) NOT NULL,
-  content MEDIUMTEXT NOT NULL
+  content MEDIUMTEXT NOT NULL,
+  FOREIGN KEY (author) REFERENCES users(id)
 )
