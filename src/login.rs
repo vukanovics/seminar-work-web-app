@@ -76,6 +76,7 @@ fn generate_session_key() -> Result<Vec<u8>, rand::Error> {
     Ok(session_key)
 }
 
+#[allow(clippy::needless_pass_by_value)]
 #[post("/login", data = "<data>")]
 pub fn post(
     jar: &CookieJar,
@@ -99,9 +100,8 @@ pub fn post(
             .database()
             .get_user_by_email(&data.username_or_email)?;
 
-        let user = match user_by_name.or(user_by_email) {
-            Some(user) => user,
-            None => break 'requirements Some("Invalid username/e-mail or password provided."),
+        let Some(user) = user_by_name.or(user_by_email) else {
+            break 'requirements Some("Invalid username/e-mail or password provided.");
         };
 
         if !bcrypt::verify(&data.password, &user.password).map_err(Error::Bcrypt)? {

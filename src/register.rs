@@ -100,6 +100,7 @@ impl RegisterForm {
     }
 }
 
+#[allow(clippy::needless_pass_by_value)]
 #[post("/register", data = "<data>")]
 pub fn post(
     state: &State<SharedState>,
