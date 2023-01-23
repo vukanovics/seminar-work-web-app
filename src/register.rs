@@ -3,7 +3,7 @@ use rocket_dyn_templates::Template;
 use serde::Serialize;
 
 use crate::{
-    application::{Error, ApplicationErrorResponder, BaseLayoutContext, SharedState},
+    application::{Error, ErrorResponder, BaseLayoutContext, SharedState},
     models::NewUser,
 };
 
@@ -56,7 +56,7 @@ impl RegisterLayoutContext {
 pub fn get(
     state: &State<SharedState>,
     jar: &CookieJar,
-) -> Result<Template, ApplicationErrorResponder> {
+) -> Result<Template, ErrorResponder> {
     Ok(Template::render(
         "register",
         RegisterLayoutContext::new(state, jar)?,
@@ -107,7 +107,7 @@ pub fn post(
     state: &State<SharedState>,
     jar: &CookieJar,
     data: Form<RegisterForm>,
-) -> Result<Template, ApplicationErrorResponder> {
+) -> Result<Template, ErrorResponder> {
     let context = RegisterLayoutContext::new(state, jar)?;
     if let Some(error_message) = 'requirements: {
         if !data.all_fields_populated() {

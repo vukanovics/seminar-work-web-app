@@ -5,13 +5,13 @@ use rocket::{
     State,
 };
 
-use crate::application::{ApplicationErrorResponder, SharedState};
+use crate::application::{ErrorResponder, SharedState};
 
 #[get("/logout")]
 pub fn get(
     state: &State<SharedState>,
     jar: &CookieJar,
-) -> Result<Redirect, ApplicationErrorResponder> {
+) -> Result<Redirect, ErrorResponder> {
     jar.get("session-key")
         .and_then(|encoded_key| {
             hex::decode(encoded_key.value())

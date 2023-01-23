@@ -9,7 +9,7 @@ use rocket_dyn_templates::Template;
 use serde::{self, Serialize};
 
 use crate::application::{
-    Error, ApplicationErrorResponder, BaseLayoutContext, SharedState,
+    Error, ErrorResponder, BaseLayoutContext, SharedState,
 };
 
 #[derive(Serialize, Debug)]
@@ -57,7 +57,7 @@ impl LoginLayoutContext {
 pub fn get(
     state: &State<SharedState>,
     jar: &CookieJar,
-) -> Result<Template, ApplicationErrorResponder> {
+) -> Result<Template, ErrorResponder> {
     Ok(Template::render(
         "login",
         LoginLayoutContext::new(state, jar)?,
@@ -88,7 +88,7 @@ pub fn post(
     jar: &CookieJar,
     state: &State<SharedState>,
     data: Form<LoginForm>,
-) -> Result<Template, ApplicationErrorResponder> {
+) -> Result<Template, ErrorResponder> {
     if let Some(error_message) = 'requirements: {
         if !data.all_fields_populated() {
             break 'requirements Some("All fields are required!");

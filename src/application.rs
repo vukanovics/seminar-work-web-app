@@ -31,11 +31,11 @@ impl From<BcryptError> for Error {
 }
 
 #[derive(Responder)]
-pub struct ApplicationErrorResponder {
+pub struct ErrorResponder {
     result: Template,
 }
 
-impl From<Error> for ApplicationErrorResponder {
+impl From<Error> for ErrorResponder {
     fn from(value: Error) -> Self {
         enum ErrorMessage<'a> {
             Reference(&'a str),
