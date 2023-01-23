@@ -127,21 +127,24 @@ impl BaseLayoutContext {
             .map(Result::flatten)
             .transpose()
     }
+
     fn get_valid_user_info(
         state: &State<SharedState>,
         jar: &CookieJar,
     ) -> Result<Option<User>, Error> {
-        // attempt the current session key cookie
-        jar.get("session-key")
+        // get a not-yet-sent session key if there is one
+        let pending = jar
+            .get_pending("session-key")
+            .map(|cookie| Self::get_valid_user_info_from_session_cookie(state, &cookie))
+            .transpose()?
+            .flatten();
+        Ok(jar
+            .get("session-key")
             .map(|cookie| Self::get_valid_user_info_from_session_cookie(state, cookie))
-            // or if that fails, try the one not yet sent to the user
-            .or_else(|| {
-                jar.get_pending("session-key")
-                    .map(|cookie| Self::get_valid_user_info_from_session_cookie(state, &cookie))
-            })
-            .transpose()
-            // combine the two options into one
-            .map(Option::flatten)
+            .transpose()?
+            .flatten()
+            // try the pending one if the received one is invalid/doesn't exist
+            .or_else(|| pending))
     }
 
     pub fn new(state: &State<SharedState>, jar: &CookieJar) -> Result<BaseLayoutContext, Error> {
