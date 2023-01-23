@@ -13,20 +13,20 @@ use crate::{database::Database, models::User};
 pub enum Error {
     MissingDatabaseUrl,
     UnableToConnectToDatabase,
-    FailedOnADatabaseQuery(DieselError),
-    FailedOnABcryptFunction(BcryptError),
+    Diesel(DieselError),
+    Bcrypt(BcryptError),
     Rand(rand::Error),
 }
 
 impl From<DieselError> for Error {
     fn from(value: DieselError) -> Self {
-        Self::FailedOnADatabaseQuery(value)
+        Self::Diesel(value)
     }
 }
 
 impl From<BcryptError> for Error {
     fn from(value: BcryptError) -> Self {
-        Self::FailedOnABcryptFunction(value)
+        Self::Bcrypt(value)
     }
 }
 
@@ -48,15 +48,13 @@ impl From<Error> for ErrorResponder {
             Error::UnableToConnectToDatabase => {
                 ErrorMessage::Reference("Unable to connect to the provided database URL")
             }
-            Error::FailedOnABcryptFunction(bcrypt_error) => {
+            Error::Bcrypt(bcrypt_error) => {
                 ErrorMessage::String(format!("Failed on a bcrypt function: {bcrypt_error}"))
             }
-            Error::FailedOnADatabaseQuery(diesel_error) => {
+            Error::Diesel(diesel_error) => {
                 ErrorMessage::String(format!("Failed on a database query: {diesel_error}"))
             }
-            Error::Rand(rand_error) => {
-                ErrorMessage::String(format!("Rand error: {rand_error}"))
-            }
+            Error::Rand(rand_error) => ErrorMessage::String(format!("Rand error: {rand_error}")),
         };
 
         let result = match message {
@@ -146,10 +144,7 @@ impl BaseLayoutContext {
             .map(|either_session_key| either_session_key.flatten())
     }
 
-    pub fn new(
-        state: &State<SharedState>,
-        jar: &CookieJar,
-    ) -> Result<BaseLayoutContext, Error> {
+    pub fn new(state: &State<SharedState>, jar: &CookieJar) -> Result<BaseLayoutContext, Error> {
         let user_info = Self::get_valid_user_info(state, jar)?;
         Ok(BaseLayoutContext {
             username: user_info.map(|info| info.username),

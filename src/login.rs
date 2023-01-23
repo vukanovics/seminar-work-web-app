@@ -112,7 +112,7 @@ pub fn post(
         };
 
         if !bcrypt::verify(&data.password, &user.password)
-            .map_err(Error::FailedOnABcryptFunction)?
+            .map_err(Error::Bcrypt)?
         {
             break 'requirements Some("Invalid username/e-mail or password provided.");
         }

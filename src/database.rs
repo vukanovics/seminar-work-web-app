@@ -30,7 +30,7 @@ impl Database {
             Ok(value) => Ok(Some(value)),
             Err(error) => match error {
                 diesel::result::Error::NotFound => Ok(None),
-                _ => Err(Error::FailedOnADatabaseQuery(error)),
+                _ => Err(Error::Diesel(error)),
             },
         }
     }
