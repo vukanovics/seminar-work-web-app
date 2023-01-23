@@ -3,7 +3,7 @@ use rocket_dyn_templates::Template;
 use serde::Serialize;
 
 use crate::{
-    application::{ApplicationError, ApplicationErrorResponder, BaseLayoutContext, SharedState},
+    application::{Error, ApplicationErrorResponder, BaseLayoutContext, SharedState},
     models::NewUser,
 };
 
@@ -21,7 +21,7 @@ impl RegisterLayoutContext {
     pub fn new(
         state: &State<SharedState>,
         jar: &CookieJar,
-    ) -> Result<RegisterLayoutContext, ApplicationError> {
+    ) -> Result<RegisterLayoutContext, Error> {
         Ok(RegisterLayoutContext {
             base_context: BaseLayoutContext::new(state, jar)?,
             previous_username: None,
@@ -83,7 +83,7 @@ impl RegisterForm {
         self.password == self.password_repeat
     }
 
-    pub fn username_is_free(&self, state: &State<SharedState>) -> Result<bool, ApplicationError> {
+    pub fn username_is_free(&self, state: &State<SharedState>) -> Result<bool, Error> {
         Ok(state
             .lock()
             .unwrap()
@@ -92,7 +92,7 @@ impl RegisterForm {
             .is_none())
     }
 
-    pub fn email_is_free(&self, state: &State<SharedState>) -> Result<bool, ApplicationError> {
+    pub fn email_is_free(&self, state: &State<SharedState>) -> Result<bool, Error> {
         Ok(state
             .lock()
             .unwrap()
@@ -134,7 +134,7 @@ pub fn post(
     }
 
     let hashed_password = bcrypt::hash(data.password.clone(), bcrypt::DEFAULT_COST)
-        .map_err(ApplicationError::FailedOnABcryptFunction)?;
+        .map_err(Error::FailedOnABcryptFunction)?;
 
     let new_user = NewUser {
         username: &data.username,

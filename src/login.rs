@@ -9,7 +9,7 @@ use rocket_dyn_templates::Template;
 use serde::{self, Serialize};
 
 use crate::application::{
-    ApplicationError, ApplicationErrorResponder, BaseLayoutContext, SharedState,
+    Error, ApplicationErrorResponder, BaseLayoutContext, SharedState,
 };
 
 #[derive(Serialize, Debug)]
@@ -25,7 +25,7 @@ impl LoginLayoutContext {
     pub fn new(
         state: &State<SharedState>,
         jar: &CookieJar,
-    ) -> Result<LoginLayoutContext, ApplicationError> {
+    ) -> Result<LoginLayoutContext, Error> {
         Ok(LoginLayoutContext {
             base_context: BaseLayoutContext::new(state, jar)?,
             previous_username_or_email: None,
@@ -112,12 +112,12 @@ pub fn post(
         };
 
         if !bcrypt::verify(&data.password, &user.password)
-            .map_err(ApplicationError::FailedOnABcryptFunction)?
+            .map_err(Error::FailedOnABcryptFunction)?
         {
             break 'requirements Some("Invalid username/e-mail or password provided.");
         }
 
-        let session_key = generate_session_key().map_err(ApplicationError::RandError)?;
+        let session_key = generate_session_key().map_err(Error::RandError)?;
 
         jar.add(Cookie::new("session-key", hex::encode(session_key.clone())));
 

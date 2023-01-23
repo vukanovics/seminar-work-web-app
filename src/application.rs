@@ -10,7 +10,7 @@ use serde::Serialize;
 use crate::{database::Database, models::User};
 
 #[derive(Debug)]
-pub enum ApplicationError {
+pub enum Error {
     MissingDatabaseUrl,
     UnableToConnectToDatabase,
     FailedOnADatabaseQuery(DieselError),
@@ -18,13 +18,13 @@ pub enum ApplicationError {
     RandError(rand::Error),
 }
 
-impl From<DieselError> for ApplicationError {
+impl From<DieselError> for Error {
     fn from(value: DieselError) -> Self {
         Self::FailedOnADatabaseQuery(value)
     }
 }
 
-impl From<BcryptError> for ApplicationError {
+impl From<BcryptError> for Error {
     fn from(value: BcryptError) -> Self {
         Self::FailedOnABcryptFunction(value)
     }
@@ -35,26 +35,26 @@ pub struct ApplicationErrorResponder {
     result: Template,
 }
 
-impl From<ApplicationError> for ApplicationErrorResponder {
-    fn from(value: ApplicationError) -> Self {
+impl From<Error> for ApplicationErrorResponder {
+    fn from(value: Error) -> Self {
         enum ErrorMessage<'a> {
             Reference(&'a str),
             String(String),
         }
         let message: ErrorMessage = match value {
-            ApplicationError::MissingDatabaseUrl => {
+            Error::MissingDatabaseUrl => {
                 ErrorMessage::Reference("Missing database URL in the server configuration")
             }
-            ApplicationError::UnableToConnectToDatabase => {
+            Error::UnableToConnectToDatabase => {
                 ErrorMessage::Reference("Unable to connect to the provided database URL")
             }
-            ApplicationError::FailedOnABcryptFunction(bcrypt_error) => {
+            Error::FailedOnABcryptFunction(bcrypt_error) => {
                 ErrorMessage::String(format!("Failed on a bcrypt function: {bcrypt_error}"))
             }
-            ApplicationError::FailedOnADatabaseQuery(diesel_error) => {
+            Error::FailedOnADatabaseQuery(diesel_error) => {
                 ErrorMessage::String(format!("Failed on a database query: {diesel_error}"))
             }
-            ApplicationError::RandError(rand_error) => {
+            Error::RandError(rand_error) => {
                 ErrorMessage::String(format!("Rand error: {rand_error}"))
             }
         };
@@ -80,7 +80,7 @@ use std::sync::Mutex;
 pub type SharedState = Mutex<SharedStateData>;
 
 impl SharedStateData {
-    pub fn new() -> Result<SharedStateData, ApplicationError> {
+    pub fn new() -> Result<SharedStateData, Error> {
         Ok(SharedStateData {
             database: Database::new()?,
         })
@@ -100,7 +100,7 @@ impl BaseLayoutContext {
     fn get_valid_user_info_from_session_cookie(
         state: &State<SharedState>,
         cookie: &Cookie<'static>,
-    ) -> Result<Option<User>, ApplicationError> {
+    ) -> Result<Option<User>, Error> {
         hex::decode(cookie.value())
             .ok()
             // attempt to get a session with that session key
@@ -132,7 +132,7 @@ impl BaseLayoutContext {
     fn get_valid_user_info(
         state: &State<SharedState>,
         jar: &CookieJar,
-    ) -> Result<Option<User>, ApplicationError> {
+    ) -> Result<Option<User>, Error> {
         // attempt the current session key cookie
         jar.get("session-key")
             .map(|cookie| Self::get_valid_user_info_from_session_cookie(state, cookie))
@@ -149,7 +149,7 @@ impl BaseLayoutContext {
     pub fn new(
         state: &State<SharedState>,
         jar: &CookieJar,
-    ) -> Result<BaseLayoutContext, ApplicationError> {
+    ) -> Result<BaseLayoutContext, Error> {
         let user_info = Self::get_valid_user_info(state, jar)?;
         Ok(BaseLayoutContext {
             username: user_info.map(|info| info.username),

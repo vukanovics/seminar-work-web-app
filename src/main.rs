@@ -18,7 +18,7 @@ use rocket::{build, fs::FileServer, launch, routes};
 use rocket_dyn_templates::Template;
 //use rocket_contrib::StaticFiles;
 
-use application::{ApplicationError, SharedStateData};
+use application::{Error, SharedStateData};
 
 #[launch]
 fn rocket() -> _ {
