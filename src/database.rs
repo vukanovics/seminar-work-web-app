@@ -78,7 +78,7 @@ impl Database {
         use crate::schema::posts::dsl::{created_on, posts};
         posts
             .limit(count)
-            .order(created_on)
+            .order(created_on.desc())
             .load::<Post>(&mut self.connection)
             .map_err(Error::Diesel)
     }

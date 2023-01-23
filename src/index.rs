@@ -25,7 +25,7 @@ impl ShortPostData {
             .get_user_by_id(post.author)?
             .ok_or(Error::PostHasInvalidUserId)?
             .username;
-        let human_creation_time = post.created_on.format("%Y-%m%d %H:%M:%S").to_string();
+        let human_creation_time = post.created_on.format("%d. %m. %Y. %H:%M:%S").to_string();
         Ok(Self {
             author,
             title: post.title,

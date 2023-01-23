@@ -22,6 +22,8 @@ body {
   /* stick the elements on opposite ends of the header */
   display: flex;
   justify-content: space-between;
+
+  background-color: #fffd;
 }
 
 .header-navigation {
@@ -150,4 +152,56 @@ body {
 
 .message-success {
   background-color: #3f3;
+}
+
+.post-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  width: 50vw;
+}
+
+.post {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  width: 100%;
+
+  background: #ddd;
+
+  margin-bottom: 5rem;
+  padding: 2rem;
+}
+
+.post-title {
+  text-decoration: bold;
+  font-size: 4rem;
+  text-align: left;
+  color: #555;
+  margin: 0;
+  margin-bottom: 1rem;
+}
+
+.post-info {
+  font-size: 1.0rem;
+
+  display: flex;
+  flex-direction: row;
+  justify-content: start;
+
+  width: 100%;
+}
+
+.post-creation-time {
+}
+
+.post-author {
+  color: #55f;
+}
+
+.post-description {
+  font-size: 1.5rem;
+  width: 100%;
 }
