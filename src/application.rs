@@ -87,6 +87,41 @@ impl SharedStateData {
     pub fn database(&mut self) -> &mut Database {
         &mut self.database
     }
+
+    fn get_valid_user_info_from_session_cookie(
+        &mut self,
+        cookie: &Cookie<'static>,
+    ) -> Result<Option<User>, Error> {
+        hex::decode(cookie.value())
+            .ok()
+            // attempt to get a session with that session key
+            .and_then(|decoded_key| self.database().get_session_by_key(decoded_key).transpose())
+            // if the session exists, attempt to get a user with the session's user_id
+            .and_then(|maybe_session| {
+                maybe_session
+                    .map(|session| self.database().get_user_by_id(session.user_id).transpose())
+                    .transpose()
+            })
+            // merge the two Results into one
+            .map(Result::flatten)
+            .transpose()
+    }
+
+    pub fn get_valid_user_info(&mut self, jar: &CookieJar) -> Result<Option<User>, Error> {
+        // get a not-yet-sent session key if there is one
+        let pending = jar
+            .get_pending("session-key")
+            .map(|cookie| self.get_valid_user_info_from_session_cookie(&cookie))
+            .transpose()?
+            .flatten();
+        Ok(jar
+            .get("session-key")
+            .map(|cookie| self.get_valid_user_info_from_session_cookie(cookie))
+            .transpose()?
+            .flatten()
+            // try the pending one if the received one is invalid/doesn't exist
+            .or_else(|| pending))
+    }
 }
 
 #[derive(Serialize, Debug)]
@@ -95,60 +130,8 @@ pub struct BaseLayoutContext {
 }
 
 impl BaseLayoutContext {
-    fn get_valid_user_info_from_session_cookie(
-        state: &State<SharedState>,
-        cookie: &Cookie<'static>,
-    ) -> Result<Option<User>, Error> {
-        hex::decode(cookie.value())
-            .ok()
-            // attempt to get a session with that session key
-            .and_then(|decoded_key| {
-                state
-                    .lock()
-                    .unwrap()
-                    .database()
-                    .get_session_by_key(decoded_key)
-                    .transpose()
-            })
-            // if the session exists, attempt to get a user with the session's user_id
-            .and_then(|maybe_session| {
-                maybe_session
-                    .map(|session| {
-                        state
-                            .lock()
-                            .unwrap()
-                            .database()
-                            .get_user_by_id(session.user_id)
-                            .transpose()
-                    })
-                    .transpose()
-            })
-            // merge the two Results into one
-            .map(Result::flatten)
-            .transpose()
-    }
-
-    fn get_valid_user_info(
-        state: &State<SharedState>,
-        jar: &CookieJar,
-    ) -> Result<Option<User>, Error> {
-        // get a not-yet-sent session key if there is one
-        let pending = jar
-            .get_pending("session-key")
-            .map(|cookie| Self::get_valid_user_info_from_session_cookie(state, &cookie))
-            .transpose()?
-            .flatten();
-        Ok(jar
-            .get("session-key")
-            .map(|cookie| Self::get_valid_user_info_from_session_cookie(state, cookie))
-            .transpose()?
-            .flatten()
-            // try the pending one if the received one is invalid/doesn't exist
-            .or_else(|| pending))
-    }
-
     pub fn new(state: &State<SharedState>, jar: &CookieJar) -> Result<BaseLayoutContext, Error> {
-        let user_info = Self::get_valid_user_info(state, jar)?;
+        let user_info = state.lock().unwrap().get_valid_user_info(jar)?;
         Ok(BaseLayoutContext {
             username: user_info.map(|info| info.username),
         })

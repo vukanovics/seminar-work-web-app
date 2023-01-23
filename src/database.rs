@@ -3,8 +3,8 @@ use std::env;
 use diesel::{mysql::MysqlConnection, prelude::*, Connection, RunQueryDsl};
 
 use crate::{
-    models::{NewUser, Session, User},
-    schema::{sessions, users},
+    models::{NewPost, NewUser, Session, User},
+    schema::{posts, sessions, users},
     Error,
 };
 
@@ -84,6 +84,13 @@ impl Database {
     pub fn create_session(&mut self, session: Session) -> Result<(), Error> {
         diesel::insert_into(sessions::table)
             .values(session)
+            .execute(&mut self.connection)?;
+        Ok(())
+    }
+
+    pub fn create_post(&mut self, post: NewPost) -> Result<(), Error> {
+        diesel::insert_into(posts::table)
+            .values(post)
             .execute(&mut self.connection)?;
         Ok(())
     }

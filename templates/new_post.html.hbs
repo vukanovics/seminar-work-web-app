@@ -1,0 +1,40 @@
+{{! vim: set ft=html: }}
+
+{{#*inline "page"}}
+
+<form class="form" action="/new_post" method="post">
+  <label for="title">Title</label>
+  <input class="text-box" type="text" id="title" name="title"
+    {{#if previous_title}}
+      value="{{previous_title}}"
+    {{/if}}
+  >
+  <br>
+  <label for="description">Description</label>
+  <input class="text-box" type="text" id="description" name="description"
+    {{#if previous_description}}
+      value="{{previous_description}}"
+    {{/if}}
+  >
+  <br>
+  <label for="content">Content</label>
+  <input class="text-box" type="text" id="content" name="content"
+    {{#if previous_content}}
+      value="{{previous_content}}"
+    {{/if}}
+  >
+  <br>
+  <input class="button button-login" type="submit" value="Create Post">
+</form>
+
+<div class="message-box">
+  {{#if error}}
+    <p class="message message-error">{{error}}</p>
+  {{/if}}
+  {{#if success}}
+    <p class="message message-success">{{success}}</p>
+  {{/if}}
+</div>
+
+{{/inline}}
+{{> base username=username }}
