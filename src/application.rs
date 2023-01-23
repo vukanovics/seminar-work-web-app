@@ -124,7 +124,7 @@ impl BaseLayoutContext {
                     .transpose()
             })
             // merge the two Results into one
-            .map(|user| user.flatten())
+            .map(Result::flatten)
             .transpose()
     }
     fn get_valid_user_info(
@@ -141,7 +141,7 @@ impl BaseLayoutContext {
             })
             .transpose()
             // combine the two options into one
-            .map(|either_session_key| either_session_key.flatten())
+            .map(Option::flatten)
     }
 
     pub fn new(state: &State<SharedState>, jar: &CookieJar) -> Result<BaseLayoutContext, Error> {
