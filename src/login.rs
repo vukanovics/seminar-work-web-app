@@ -117,7 +117,7 @@ pub fn post(
             break 'requirements Some("Invalid username/e-mail or password provided.");
         }
 
-        let session_key = generate_session_key().map_err(Error::RandError)?;
+        let session_key = generate_session_key().map_err(Error::Rand)?;
 
         jar.add(Cookie::new("session-key", hex::encode(session_key.clone())));
 

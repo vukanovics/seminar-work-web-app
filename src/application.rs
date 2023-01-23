@@ -15,7 +15,7 @@ pub enum Error {
     UnableToConnectToDatabase,
     FailedOnADatabaseQuery(DieselError),
     FailedOnABcryptFunction(BcryptError),
-    RandError(rand::Error),
+    Rand(rand::Error),
 }
 
 impl From<DieselError> for Error {
@@ -54,7 +54,7 @@ impl From<Error> for ErrorResponder {
             Error::FailedOnADatabaseQuery(diesel_error) => {
                 ErrorMessage::String(format!("Failed on a database query: {diesel_error}"))
             }
-            Error::RandError(rand_error) => {
+            Error::Rand(rand_error) => {
                 ErrorMessage::String(format!("Rand error: {rand_error}"))
             }
         };
