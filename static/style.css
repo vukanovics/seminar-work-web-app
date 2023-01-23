@@ -1,0 +1,96 @@
+body {
+  padding: 0;
+  margin: 0;
+
+  /* also used as top margin for content, so that
+   * it doesn't overlap the header */
+  --header-height: 10vh;
+}
+
+.header-container {
+  /* always at top, taking up full width and the set view height */
+  width: 100%;
+  height: var(--header-height);
+  position: fixed;
+  left: 0;
+  top: 0;
+
+  border: 1px solid black;
+
+  /* stick the elements on opposite ends of the header */
+  display: flex;
+  justify-content: space-between;
+}
+
+.header-navigation {
+  /* center the text */
+  display: flex;
+  align-items: center;
+
+  padding: 1vw;
+}
+
+.header-user-data {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1vw;
+}
+
+.title {
+  text-decoration-line: none;
+  color: #333;
+  font-size: 2.0em;
+}
+
+.title:hover {
+  text-decoration-line: underline;
+}
+
+.button {
+  margin: 1vw;
+  border: 2px solid black; 
+  padding: 10px;
+  text-decoration-line: none;
+
+  /* this is also the background hover for hover */
+  --button-text-color: #333;
+
+  color: var(--button-text-color);
+}
+
+.button:hover {
+  text-decoration-line: underline;
+}
+
+.button-login {
+  background-color: #aa55ff;
+}
+
+.button-login:hover {
+  background-color: var(--button-text-color);
+  color: #aa55ff;
+}
+
+.button-register {
+  background-color: #00aaff;
+}
+
+.button-register:hover {
+  background-color: var(--button-text-color);
+  color: #00aaff;
+}
+
+.button-logout {
+  background-color: #ff007f;
+}
+
+.button-logout:hover {
+  background-color: var(--button-text-color);
+  color: #ff007f;
+}
+
+.content {
+  margin-top: var(--header-height);
+  padding-top: 2vh;
+}

@@ -3,15 +3,26 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <link rel="stylesheet" href="style.css">
     <title>Seminarski</title>
   </head>
   <body>
-    {{#if username}}
-      <p>You are logged in as {{username}}.</p>
-    {{else}}
-      <p><a href="/login">Login</a> or <a href="/register">Register</a>
-    {{/if}}
-
-    {{> page}}
+    <div class="header-container">
+      <div class="header-navigation">
+        <a class="title" href="/">Seminarski rad</a>
+      </div>
+      <div class="header-user-data">
+        {{#if username}}
+          Good day, {{username}}!
+          <a class="button button-logout" href="/logout">Log out</a>
+        {{else}}
+          <a class="button button-login" href="/login">Login</a>
+          <a class="button button-register" href="/register">Register</a>
+        {{/if}}
+      </div>
+    </div>
+    <div class="content">
+      {{> page}}
+    </div>
   </body>
 </html>

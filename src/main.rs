@@ -13,8 +13,9 @@ mod schema;
 use std::sync::Mutex;
 
 use dotenvy::dotenv;
-use rocket::{build, launch, routes};
+use rocket::{build, fs::FileServer, launch, routes};
 use rocket_dyn_templates::Template;
+//use rocket_contrib::StaticFiles;
 
 use application::{ApplicationError, SharedStateData};
 
@@ -24,6 +25,7 @@ fn rocket() -> _ {
 
     let shared_state = Mutex::new(SharedStateData::new().unwrap());
     build()
+        .mount("/", FileServer::from("static"))
         .mount(
             "/",
             routes![
