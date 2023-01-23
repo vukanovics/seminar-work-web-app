@@ -3,7 +3,7 @@ use rocket_dyn_templates::Template;
 use serde::Serialize;
 
 use crate::{
-    application::{Error, ErrorResponder, BaseLayoutContext, SharedState},
+    application::{BaseLayoutContext, Error, ErrorResponder, SharedState},
     models::NewUser,
 };
 
@@ -53,10 +53,7 @@ impl RegisterLayoutContext {
 }
 
 #[get("/register")]
-pub fn get(
-    state: &State<SharedState>,
-    jar: &CookieJar,
-) -> Result<Template, ErrorResponder> {
+pub fn get(state: &State<SharedState>, jar: &CookieJar) -> Result<Template, ErrorResponder> {
     Ok(Template::render(
         "register",
         RegisterLayoutContext::new(state, jar)?,
@@ -133,8 +130,8 @@ pub fn post(
         ));
     }
 
-    let hashed_password = bcrypt::hash(data.password.clone(), bcrypt::DEFAULT_COST)
-        .map_err(Error::Bcrypt)?;
+    let hashed_password =
+        bcrypt::hash(data.password.clone(), bcrypt::DEFAULT_COST).map_err(Error::Bcrypt)?;
 
     let new_user = NewUser {
         username: &data.username,

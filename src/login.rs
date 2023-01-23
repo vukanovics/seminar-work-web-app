@@ -8,9 +8,7 @@ use rocket::{
 use rocket_dyn_templates::Template;
 use serde::{self, Serialize};
 
-use crate::application::{
-    Error, ErrorResponder, BaseLayoutContext, SharedState,
-};
+use crate::application::{BaseLayoutContext, Error, ErrorResponder, SharedState};
 
 #[derive(Serialize, Debug)]
 struct LoginLayoutContext {
@@ -22,10 +20,7 @@ struct LoginLayoutContext {
 }
 
 impl LoginLayoutContext {
-    pub fn new(
-        state: &State<SharedState>,
-        jar: &CookieJar,
-    ) -> Result<LoginLayoutContext, Error> {
+    pub fn new(state: &State<SharedState>, jar: &CookieJar) -> Result<LoginLayoutContext, Error> {
         Ok(LoginLayoutContext {
             base_context: BaseLayoutContext::new(state, jar)?,
             previous_username_or_email: None,
@@ -54,10 +49,7 @@ impl LoginLayoutContext {
 }
 
 #[get("/login")]
-pub fn get(
-    state: &State<SharedState>,
-    jar: &CookieJar,
-) -> Result<Template, ErrorResponder> {
+pub fn get(state: &State<SharedState>, jar: &CookieJar) -> Result<Template, ErrorResponder> {
     Ok(Template::render(
         "login",
         LoginLayoutContext::new(state, jar)?,
@@ -111,9 +103,7 @@ pub fn post(
             None => break 'requirements Some("Invalid username/e-mail or password provided."),
         };
 
-        if !bcrypt::verify(&data.password, &user.password)
-            .map_err(Error::Bcrypt)?
-        {
+        if !bcrypt::verify(&data.password, &user.password).map_err(Error::Bcrypt)? {
             break 'requirements Some("Invalid username/e-mail or password provided.");
         }
 
