@@ -14,8 +14,7 @@ pub struct Database {
 
 impl Database {
     pub fn new() -> Result<Database, Error> {
-        let database_url =
-            env::var("DATABASE_URL").map_err(|_| Error::MissingDatabaseUrl)?;
+        let database_url = env::var("DATABASE_URL").map_err(|_| Error::MissingDatabaseUrl)?;
 
         let connection = MysqlConnection::establish(&database_url)
             .map_err(|_| Error::UnableToConnectToDatabase)?;
@@ -36,7 +35,7 @@ impl Database {
     }
 
     pub fn get_user_by_id(&mut self, by_id: i32) -> Result<Option<User>, Error> {
-        use crate::schema::users::dsl::*;
+        use crate::schema::users::dsl::{id, users};
         Self::diesel_result_to_option(
             users
                 .filter(id.eq(by_id))
@@ -45,11 +44,8 @@ impl Database {
         )
     }
 
-    pub fn get_user_by_username(
-        &mut self,
-        by_username: &str,
-    ) -> Result<Option<User>, Error> {
-        use crate::schema::users::dsl::*;
+    pub fn get_user_by_username(&mut self, by_username: &str) -> Result<Option<User>, Error> {
+        use crate::schema::users::dsl::{username, users};
         Self::diesel_result_to_option(
             users
                 .filter(username.eq(by_username))
@@ -59,7 +55,7 @@ impl Database {
     }
 
     pub fn get_user_by_email(&mut self, by_email: &str) -> Result<Option<User>, Error> {
-        use crate::schema::users::dsl::*;
+        use crate::schema::users::dsl::{email, users};
         Self::diesel_result_to_option(
             users
                 .filter(email.eq(by_email))
@@ -68,11 +64,8 @@ impl Database {
         )
     }
 
-    pub fn get_session_by_key(
-        &mut self,
-        by_key: Vec<u8>,
-    ) -> Result<Option<Session>, Error> {
-        use crate::schema::sessions::dsl::*;
+    pub fn get_session_by_key(&mut self, by_key: Vec<u8>) -> Result<Option<Session>, Error> {
+        use crate::schema::sessions::dsl::{session_key, sessions};
         Self::diesel_result_to_option(
             sessions
                 .filter(session_key.eq(by_key))
@@ -96,7 +89,7 @@ impl Database {
     }
 
     pub fn remove_session_by_key(&mut self, by_key: Vec<u8>) -> Result<(), Error> {
-        use crate::schema::sessions::dsl::*;
+        use crate::schema::sessions::dsl::{session_key, sessions};
         diesel::delete(sessions)
             .filter(session_key.eq(by_key))
             .execute(&mut self.connection)?;
