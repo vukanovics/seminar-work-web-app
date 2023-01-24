@@ -47,8 +47,9 @@ struct IndexLayoutContext {
 
 impl IndexLayoutContext {
     pub fn new(state: &State<SharedState>, jar: &CookieJar) -> Result<IndexLayoutContext, Error> {
+        // sticking these two together won't release the mutex after retrieving
+        // the posts, making the map stuck
         let posts = state.lock().unwrap().database().get_latest_x_posts(10)?;
-        // top posts drops to drop the mutex lock, else we are stuck
         let posts = posts
             .into_iter()
             .map(|post| ShortPostData::from_post(state, post))
