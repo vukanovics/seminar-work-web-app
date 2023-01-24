@@ -10,8 +10,7 @@ use crate::{
 #[derive(Serialize, Debug)]
 struct ShortPostData {
     author: String,
-    // human-readable creation time
-    human_creation_time: String,
+    human_readable_creation_time: String,
     title: String,
     description: String,
 }
@@ -25,12 +24,15 @@ impl ShortPostData {
             .get_user_by_id(post.author)?
             .ok_or(Error::PostHasInvalidUserId)?
             .username;
-        let human_creation_time = post.created_on.format("%d. %m. %Y. %H:%M:%S").to_string();
+
+        let human_readable_creation_time =
+            post.created_on.format("%d. %m. %Y. %H:%M:%S").to_string();
+
         Ok(Self {
             author,
             title: post.title,
             description: post.description,
-            human_creation_time,
+            human_readable_creation_time,
         })
     }
 }
