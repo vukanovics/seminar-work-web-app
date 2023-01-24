@@ -74,6 +74,16 @@ impl Database {
         )
     }
 
+    pub fn get_post_by_id(&mut self, by_id: i32) -> Result<Option<Post>, Error> {
+        use crate::schema::posts::dsl::{id, posts};
+        Self::diesel_result_to_option(
+            posts
+                .filter(id.eq(by_id))
+                .limit(1)
+                .first::<Post>(&mut self.connection),
+        )
+    }
+
     pub fn get_latest_x_posts(&mut self, count: i64) -> Result<Vec<Post>, Error> {
         use crate::schema::posts::dsl::{created_on, posts};
         posts

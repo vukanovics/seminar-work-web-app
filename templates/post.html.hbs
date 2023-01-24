@@ -1,0 +1,17 @@
+{{! vim: set ft=html: }}
+
+{{#*inline "page"}}
+
+<div class="post">
+  <p class="post-title">{{post.title}}</p>
+  <div class="post-info">
+    <a class="post-creation-time">{{post.human_readable_creation_time}}</a>
+    |
+    <a class="post-author">{{post.author}}</a>
+  </div>
+  <p class="post-description">{{post.description}}</p>
+  <p class="post-description">{{post.content}}</p>
+</div>
+
+{{/inline}}
+{{> base username=username }}

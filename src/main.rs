@@ -9,6 +9,7 @@ mod index;
 mod login;
 mod logout;
 mod new_post;
+mod post;
 mod register;
 
 mod models;
@@ -45,7 +46,8 @@ fn rocket() -> _ {
                 login::post,
                 logout::get,
                 new_post::get,
-                new_post::post
+                new_post::post,
+                post::get,
             ],
         )
         .attach(fairing)
