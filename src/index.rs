@@ -13,6 +13,7 @@ struct ShortPostData {
     human_readable_creation_time: String,
     title: String,
     description: String,
+    post_url: String,
 }
 
 impl ShortPostData {
@@ -28,11 +29,14 @@ impl ShortPostData {
         let human_readable_creation_time =
             post.created_on.format("%d. %m. %Y. %H:%M:%S").to_string();
 
+        let post_url = format!("/post/{}", post.id);
+
         Ok(Self {
             author,
             title: post.title,
             description: post.description,
             human_readable_creation_time,
+            post_url,
         })
     }
 }

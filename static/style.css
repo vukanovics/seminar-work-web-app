@@ -184,12 +184,17 @@ body {
 }
 
 .post-title {
-  text-decoration: bold;
+  font-weight: bold;
+  text-decoration-line: none;
   font-size: 4rem;
   text-align: left;
   color: #555;
   margin: 0;
   margin-bottom: 1rem;
+}
+
+.post-title:hover {
+  text-decoration-line: underline;
 }
 
 .post-info {

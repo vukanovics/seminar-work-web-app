@@ -5,7 +5,7 @@
 <div class="post-container">
   {{#each posts}}
   <div class="post">
-    <p class="post-title">{{this.title}}</p>
+    <a class="post-title" href="{{this.post_url}}">{{this.title}}</a>
     <div class="post-info">
       <a class="post-creation-time">{{this.human_readable_creation_time}}</a>
       |
