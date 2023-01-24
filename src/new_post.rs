@@ -1,5 +1,5 @@
 use rocket::{form::Form, get, http::CookieJar, post, FromForm, State};
-use rocket_dyn_templates::Template;
+use rocket_dyn_templates::{handlebars::html_escape, Template};
 use serde::{self, Serialize};
 
 use crate::{
@@ -87,12 +87,16 @@ pub fn post(
             break 'requirements Some("You need to log in first!")
         };
 
+        let safe_title = html_escape(&data.title);
+        let safe_description = html_escape(&data.description);
+        let safe_content = html_escape(&data.content);
+
         state.lock().unwrap().database().create_post(NewPost {
             author: user_info.id,
             created_on: chrono::offset::Utc::now().naive_utc(),
-            title: &data.title,
-            description: &data.description,
-            content: &data.content,
+            title: &safe_title,
+            description: &safe_description,
+            content: &safe_content,
         })?;
 
         None
