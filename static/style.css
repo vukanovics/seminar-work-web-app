@@ -101,6 +101,14 @@ body {
   color: #ff007f;
 }
 
+.button-new-post {
+  background-color: #55ff7f;
+}
+
+.button-new-post:hover {
+  background-color: var(--button-text-color);
+  color: #55ff7f;
+}
 .content {
   /* ensure that the header doesn't cover the content */
   margin-top: var(--header-height);

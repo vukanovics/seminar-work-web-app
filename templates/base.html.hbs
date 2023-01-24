@@ -14,6 +14,7 @@
       <div class="header-user-data">
         {{#if username}}
           Good day, {{username}}!
+          <a class="button header-button button-new-post" href="/new_post">Create a post</a>
           <a class="button header-button button-logout" href="/logout">Log out</a>
         {{else}}
           <a class="button header-button button-login" href="/login">Login</a>
