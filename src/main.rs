@@ -8,8 +8,8 @@ mod database;
 mod index;
 mod login;
 mod logout;
-mod register;
 mod new_post;
+mod register;
 
 mod models;
 mod schema;
@@ -19,13 +19,18 @@ use std::sync::Mutex;
 use dotenvy::dotenv;
 use rocket::{build, fs::FileServer, launch, routes};
 use rocket_dyn_templates::Template;
-//use rocket_contrib::StaticFiles;
 
 use application::{Error, SharedStateData};
 
 #[launch]
 fn rocket() -> _ {
     dotenv().ok();
+
+    let fairing = Template::custom(|engines| {
+        engines
+            .handlebars
+            .register_escape_fn(rocket_dyn_templates::handlebars::no_escape)
+    });
 
     let shared_state = Mutex::new(SharedStateData::new().unwrap());
     build()
@@ -43,6 +48,6 @@ fn rocket() -> _ {
                 new_post::post
             ],
         )
-        .attach(Template::fairing())
+        .attach(fairing)
         .manage(shared_state)
 }
