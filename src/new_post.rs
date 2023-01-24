@@ -32,9 +32,10 @@ impl NewPostLayoutContext {
     }
 
     pub fn with_previous_data(mut self, data: &NewPostForm) -> Self {
-        self.previous_title = data.title.clone();
-        self.previous_content = data.content.clone();
-        self.previous_description = data.description.clone();
+        self.previous_title = rocket_dyn_templates::handlebars::html_escape(&data.title);
+        self.previous_content = rocket_dyn_templates::handlebars::html_escape(&data.content);
+        self.previous_description =
+            rocket_dyn_templates::handlebars::html_escape(&data.description);
         self
     }
 
