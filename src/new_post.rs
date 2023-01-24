@@ -90,7 +90,9 @@ pub fn post(
 
         let safe_title = html_escape(&data.title);
         let safe_description = html_escape(&data.description);
-        let safe_content = html_escape(&data.content);
+        // content is escaped when rendering, by the comrak crate
+        // if we escape it now, it doesn't let comrak draw code & quote blocks
+        let safe_content = &data.content;
 
         state.lock().unwrap().database().create_post(NewPost {
             author: user_info.id,
