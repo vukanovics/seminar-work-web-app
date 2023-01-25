@@ -1872,7 +1872,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ddccb15bcce173023b3fedd9436f882a0739b8dfb45e4f6b6002bee5929f61b2"
 
 [[package]]
-name = "seminarski-php"
+name = "seminar-work-web-app"
 version = "0.1.0"
 dependencies = [
  "bcrypt",
