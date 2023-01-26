@@ -11,7 +11,9 @@
       <a class="post-author">{{post.author}}</a>
     </div>
     <p class="post-description">{{post.description}}</p>
-    <div class="post-content">{{post.content}}</div>
+    {{! triple 'mustache' tells handlebars not to escape the HTML code }}
+    {{! with only double, it would strip out tags generated from the markdown }}
+    <div class="post-content">{{{post.content}}}</div>
   </div>
 </div>
 

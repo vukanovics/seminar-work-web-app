@@ -1,5 +1,5 @@
 use rocket::{form::Form, get, http::CookieJar, post, FromForm, State};
-use rocket_dyn_templates::{handlebars::html_escape, Template};
+use rocket_dyn_templates::Template;
 use serde::{self, Serialize};
 
 use crate::{
@@ -32,10 +32,10 @@ impl NewPostLayoutContext {
     }
 
     pub fn with_previous_data(mut self, data: &NewPostForm) -> Self {
-        self.previous_title = rocket_dyn_templates::handlebars::html_escape(&data.title);
-        self.previous_content = rocket_dyn_templates::handlebars::html_escape(&data.content);
-        self.previous_description =
-            rocket_dyn_templates::handlebars::html_escape(&data.description);
+        // all three of these are HTML escaped by handlebars
+        self.previous_title = data.title.clone();
+        self.previous_content = data.content.clone();
+        self.previous_description = data.description.clone();
         self
     }
 
@@ -88,18 +88,14 @@ pub fn post(
             break 'requirements Some("You need to log in first!")
         };
 
-        let safe_title = html_escape(&data.title);
-        let safe_description = html_escape(&data.description);
-        // content is escaped when rendering, by the comrak crate
-        // if we escape it now, it doesn't let comrak draw code & quote blocks
-        let safe_content = &data.content;
-
         state.lock().unwrap().database().create_post(NewPost {
             author: user_info.id,
             created_on: chrono::offset::Utc::now().naive_utc(),
-            title: &safe_title,
-            description: &safe_description,
-            content: &safe_content,
+            // HTML in title & description is automatically escaped by handebars
+            title: &data.title,
+            description: &data.description,
+            // HTML in content is automatically escaped by comrak (the markdown renderer)
+            content: &data.content,
         })?;
 
         None

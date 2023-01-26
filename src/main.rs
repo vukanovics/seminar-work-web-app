@@ -27,12 +27,6 @@ use application::{Error, SharedStateData};
 fn rocket() -> _ {
     dotenv().ok();
 
-    let fairing = Template::custom(|engines| {
-        engines
-            .handlebars
-            .register_escape_fn(rocket_dyn_templates::handlebars::no_escape)
-    });
-
     let shared_state = Mutex::new(SharedStateData::new().unwrap());
     build()
         .mount("/", FileServer::from("static"))
@@ -50,6 +44,6 @@ fn rocket() -> _ {
                 post::get,
             ],
         )
-        .attach(fairing)
+        .attach(Template::fairing())
         .manage(shared_state)
 }
