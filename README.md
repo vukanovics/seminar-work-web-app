@@ -4,6 +4,9 @@ A blog platform written in Rust with the Rocket framework
 ## Requirements
 You will need [Rust](https://www.rust-lang.org/tools/install) and Cargo,
 the official Rust package manager, which should come with Rust.  
+
+NOTE: This project uses the nightly and not the stable Rust version.  
+
 You will also need a SQL database server, like for example [MariaDB](https://mariadb.org/).  
 Finally, you will need [Git](https://git-scm.com/) to download this project (or you can click Code->Download Zip above).
 
@@ -12,11 +15,19 @@ Clone this repository with git:
 
 ```git clone https://github.com/vukanovics/seminar-work-web-app.git```  
 
+Switch the working directory to the project:  
+
+```cd seminar-work-web-app```  
+
+Ensure Cargo is using the nightly version instead of stable:  
+
+```rustup override set nightly```  
+
 Install diesel_cli with Cargo:  
 
 ```cargo install diesel_cli```  
 
-Create a ```.env``` in the project root with the database info:  
+Create a ```.env``` file in the project root with the database info:  
 
 ```DATABASE_URL=mysql://<username>:<password>@localhost/<database_name>```  
 
